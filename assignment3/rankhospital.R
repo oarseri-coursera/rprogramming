@@ -1,4 +1,4 @@
-best <- function(state, outcome) {
+rankhospital <- function(state, outcome, num = "best") {
 
   # Read outcome data.
   data <- read.csv("outcome-of-care-measures.csv",
@@ -18,18 +18,24 @@ best <- function(state, outcome) {
   )
   if (c == -1) stop("invalid outcome")
 
-  # Get minimum value for outcome.
+  # Order on the outcome (and secondarily, on hospital name); remove NAs
   vals <- as.numeric(state_data[,c])
   hnames <- state_data$Hospital.Name
   ordered <- state_data[order(vals,hnames),]
+  ordered <- ordered[!is.na(ordered[,c]),]
 
-  ordered$Hospital.Name[1]
+  # Output name of ith-ranked hospital (or best, or worst).
+  ordered_names <- ordered$Hospital.Name
+  if (num == "best") {
+    ordered_names[1]
+  } else if (num == "worst") {
+    ordered_names[length(ordered_names)]
+  } else {
+    ordered_names[num]
+  }
+
 }
 
-# best("TX", "heart attack")
-# best("TX", "heart failure")
-# best("MD", "heart attack")
-# best("MD", "pneumonia")
-
-# best("BB", "heart attack")
-# best("NY", "hert attack")
+# print(rankhospital("TX", "heart failure", 4))
+# print(rankhospital("MD", "heart attack", "worst"))
+# print(rankhospital("MN", "heart attack", 5000))
